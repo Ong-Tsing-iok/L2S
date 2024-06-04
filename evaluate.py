@@ -73,7 +73,12 @@ def load_network_stageI(netG_path,mesh_net_path):
             state_dict = \
                 torch.load(mesh_net_path,
                            map_location=lambda storage, loc: storage)
-            mesh_net.load_state_dict(state_dict)
+            new_dict = {}
+            for k, v in state_dict.items():
+                if k == 'pool1.weight' or k == 'pool2.weight' or k == 'pool3.weight':
+                    k = f'{k[:6]}select.{k[6:]}'
+                new_dict[k] = v
+            mesh_net.load_state_dict(new_dict)
             print('Load from: ', mesh_net_path)
 
 
@@ -176,7 +181,7 @@ def evaluate():
 
          
             inputs = (txt_embedding,mesh_embed)
-            lr_fake, fake, _ = nn.parallel.data_parallel(netG, inputs, gpus)
+            lr_fake, fake, _ = nn.parallel.data_parallel(netG, inputs, [gpus[0]])
 
             for i in range(len(fake)):
                 if(not os.path.exists(output_embed+"/"+folder_name_list[i])):

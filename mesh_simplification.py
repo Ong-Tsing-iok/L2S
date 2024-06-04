@@ -1,5 +1,6 @@
 import pymeshlab as ml
 import os
+import time
 
 #6810
 #13311
@@ -16,7 +17,7 @@ for subdir,dir,files in os.walk(path):
     for file in files:
 
         if(file.endswith(".obj")):
-            
+            start_time = time.time()
             f_path=os.path.join(subdir,file)
             m_path=os.path.join(move_path,file)
             TARGET_Faces=2000
@@ -29,7 +30,7 @@ for subdir,dir,files in os.walk(path):
 
 
          
-            ms.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TARGET_Faces, preservenormal=True)
+            ms.meshing_decimation_quadric_edge_collapse(targetfacenum=TARGET_Faces, preservenormal=True)
             print("Decimated to", TARGET_Faces, "faces mesh has", ms.current_mesh().vertex_number(), "vertex")
            
 
@@ -37,3 +38,5 @@ for subdir,dir,files in os.walk(path):
             m = ms.current_mesh()
             print('output mesh has', m.vertex_number(), 'vertex and', m.face_number(), 'faces')
             ms.save_current_mesh(m_path)
+            end_time = time.time()
+            print(f"time for simplifying is {end_time - start_time}")
